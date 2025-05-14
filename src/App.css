@@ -1,0 +1,66 @@
+/* src/App.css */
+.app {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .instructions-button {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 16px;
+  }
+  
+  .instructions-button:hover {
+    background-color: rgba(42, 96, 153, 0.1);
+  }
+  
+  .setup-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .start-button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    font-size: 18px;
+  }
+  
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  @media (max-width: 600px) {
+    .app-header {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .game-info {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
