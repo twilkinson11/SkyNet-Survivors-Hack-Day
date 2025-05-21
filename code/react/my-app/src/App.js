@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
-
+import { useState, useEffect } from 'react';
 
 // Card component to represent each playing card
 const Card = ({ card, index, handleClick, isFlipped }) => {
@@ -35,9 +34,7 @@ export default function MemoryCardGame() {
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   
-useCallback(() =>  {
-
-  // Shuffle cards
+  // Shuffle cards function - defined outside useCallback
   const shuffleCards = () => {
     // Create shuffled cards
     const shuffled = [...cardValues]
@@ -52,12 +49,12 @@ useCallback(() =>  {
     setGameOver(false);
     setWinner(null);
   };
-}, [])
 
   // Initialize game
   useEffect(() => {
     shuffleCards();
-  }, [shuffleCards]);
+    // Empty dependency array means this runs only once on component mount
+  }, []);
 
   // Handle card click
   const handleCardClick = (index) => {
@@ -90,7 +87,7 @@ useCallback(() =>  {
         newScores[currentPlayer] += 5;
         setScores(newScores);
         
-        // Check if game is over (3 matches found)
+        // Check if game is over (5 matches found)
         if (matchedPairs.length + 1 === 5) { // 5 pairs in total (10 cards paired)
           setGameOver(true);
           
@@ -122,8 +119,6 @@ useCallback(() =>  {
   const isCardFlipped = (index) => {
     return flippedIndices.includes(index) || matchedPairs.includes(cards[index].value);
   };
-
-
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -173,10 +168,5 @@ useCallback(() =>  {
         </div>
       )}
     </div>
-  )
+  );
 }
-
-
-
-
-
