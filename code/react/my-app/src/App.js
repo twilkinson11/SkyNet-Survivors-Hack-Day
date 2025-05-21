@@ -1,27 +1,69 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-// Card component
+// Card component with nicer styles and flip animation
 const Card = ({ card, index, handleClick, isFlipped }) => {
   return (
-    <div 
-      style={{
-        height: 100,
-        width: 60,
-        margin: 5,
-        borderRadius: 8,
-        cursor: 'pointer',
-        backgroundColor: isFlipped ? 'white' : 'blue',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 24,
-        color: isFlipped ? 'black' : 'white',
-        userSelect: 'none',
-        boxShadow: '0 0 5px rgba(0,0,0,0.3)'
-      }}
+    <div
       onClick={() => handleClick(index)}
+      style={{
+        perspective: 800,
+        cursor: 'pointer',
+        width: 80,
+        height: 120,
+      }}
     >
-      {isFlipped ? card.value : '?'}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          textAlign: 'center',
+          borderRadius: 12,
+          boxShadow: '0 8px 14px rgba(0, 0, 0, 0.25)',
+          transition: 'transform 0.6s',
+          transformStyle: 'preserve-3d',
+          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          userSelect: 'none',
+        }}
+      >
+        {/* Front side (face down) */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#1e40af',
+            borderRadius: 12,
+            color: 'white',
+            fontSize: 48,
+            lineHeight: '120px',
+            backfaceVisibility: 'hidden',
+            boxShadow: 'inset 0 0 10px rgba(255,255,255,0.2)',
+          }}
+        >
+          ?
+        </div>
+
+        {/* Back side (face up) */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'white',
+            borderRadius: 12,
+            color: '#1e40af',
+            fontSize: 56,
+            fontWeight: '700',
+            lineHeight: '120px',
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            boxShadow: '0 0 8px #1e40af',
+          }}
+        >
+          {card.value}
+        </div>
+      </div>
     </div>
   );
 };
@@ -87,12 +129,12 @@ export default function MemoryCardGame() {
 
         setTimeout(() => {
           setFlippedIndices([]);
-        }, 1000);
+        }, 1200);
       } else {
         setTimeout(() => {
           setFlippedIndices([]);
           setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
-        }, 1000);
+        }, 1200);
       }
     }
   };
@@ -102,18 +144,60 @@ export default function MemoryCardGame() {
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 400, margin: 'auto' }}>
-      <h1>Memory Card Game</h1>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-        <div style={{ padding: 8, backgroundColor: currentPlayer === 1 ? 'dodgerblue' : 'lightgray', color: currentPlayer === 1 ? 'white' : 'black', borderRadius: 4 }}>
-          Player 1: {scores[1]} pts
-        </div>
-        <div style={{ padding: 8, backgroundColor: currentPlayer === 2 ? 'dodgerblue' : 'lightgray', color: currentPlayer === 2 ? 'white' : 'black', borderRadius: 4 }}>
-          Player 2: {scores[2]} pts
-        </div>
+    <div
+      style={{
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        minHeight: '100vh',
+        backgroundColor: '#f3f4f6',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+      }}
+    >
+      <h1 style={{ fontSize: 36, color: '#111827', marginBottom: 24 }}>Memory Card Game</h1>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 20,
+          marginBottom: 32,
+          width: '100%',
+          maxWidth: 360,
+          justifyContent: 'space-between',
+        }}
+      >
+        {[1, 2].map((player) => (
+          <div
+            key={player}
+            style={{
+              flex: 1,
+              backgroundColor: currentPlayer === player ? '#2563eb' : '#e5e7eb',
+              color: currentPlayer === player ? 'white' : '#374151',
+              padding: '12px 0',
+              borderRadius: 12,
+              textAlign: 'center',
+              fontWeight: '600',
+              boxShadow: currentPlayer === player ? '0 4px 12px rgba(37, 99, 235, 0.4)' : 'none',
+              userSelect: 'none',
+              transition: 'background-color 0.3s, color 0.3s',
+            }}
+          >
+            Player {player}: {scores[player]} pts
+          </div>
+        ))}
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 80px)',
+          gap: 16,
+          marginBottom: 32,
+          justifyContent: 'center',
+        }}
+      >
         {cards.map((card, index) => (
           <Card
             key={index}
@@ -126,16 +210,42 @@ export default function MemoryCardGame() {
       </div>
 
       {gameOver && (
-        <div style={{ marginTop: 20, backgroundColor: '#fff3cd', padding: 15, borderRadius: 6, textAlign: 'center' }}>
-          <h2>Game Over!</h2>
+        <div
+          style={{
+            backgroundColor: '#fff7ed',
+            borderRadius: 12,
+            padding: 24,
+            maxWidth: 360,
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 8px 20px rgba(252, 211, 77, 0.6)',
+            userSelect: 'none',
+          }}
+        >
+          <h2 style={{ fontSize: 28, marginBottom: 12, color: '#b45309' }}>Game Over!</h2>
           {winner === 0 ? (
-            <p>It's a draw!</p>
+            <p style={{ fontSize: 20, marginBottom: 20 }}>It's a draw!</p>
           ) : (
-            <p>Player {winner} wins with {scores[winner]} points!</p>
+            <p style={{ fontSize: 20, marginBottom: 20 }}>
+              Player {winner} wins with {scores[winner]} points!
+            </p>
           )}
           <button
-            style={{ marginTop: 10, padding: '10px 20px', backgroundColor: 'dodgerblue', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
             onClick={shuffleCards}
+            style={{
+              backgroundColor: '#2563eb',
+              color: 'white',
+              fontWeight: '600',
+              border: 'none',
+              borderRadius: 8,
+              padding: '10px 24px',
+              fontSize: 18,
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.6)',
+              transition: 'background-color 0.3s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#1d4ed8')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#2563eb')}
           >
             Play Again
           </button>
@@ -143,8 +253,15 @@ export default function MemoryCardGame() {
       )}
 
       {!gameOver && (
-        <div style={{ marginTop: 20, fontWeight: 'bold' }}>
-          Player {currentPlayer}'s turn - Choose two cards to flip
+        <div
+          style={{
+            fontSize: 20,
+            fontWeight: '600',
+            color: '#374151',
+            userSelect: 'none',
+          }}
+        >
+          Player {currentPlayer}&apos;s turn - Choose two cards to flip
         </div>
       )}
     </div>
