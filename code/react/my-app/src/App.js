@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 
 // Card component to represent each playing card
@@ -35,6 +35,7 @@ export default function MemoryCardGame() {
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   
+useCallback(() =>  {
 
   // Shuffle cards
   const shuffleCards = () => {
@@ -43,8 +44,6 @@ export default function MemoryCardGame() {
       .map(value => ({ value, matched: false }))
       .sort(() => Math.random() - 0.5);
 
-      
-    
     setCards(shuffled);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -53,11 +52,12 @@ export default function MemoryCardGame() {
     setGameOver(false);
     setWinner(null);
   };
+}, [])
 
   // Initialize game
   useEffect(() => {
     shuffleCards();
-  } );
+  }, [shuffleCards]);
 
   // Handle card click
   const handleCardClick = (index) => {
