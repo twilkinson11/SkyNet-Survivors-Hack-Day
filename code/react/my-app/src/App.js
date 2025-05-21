@@ -1,31 +1,34 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-// Card component to represent each playing card
+// Card component
 const Card = ({ card, index, handleClick, isFlipped }) => {
   return (
     <div 
-      className={`h-32 w-24 rounded-lg cursor-pointer transform transition-transform duration-300 ${isFlipped ? 'rotate-y-180' : ''}`}
+      style={{
+        height: 100,
+        width: 60,
+        margin: 5,
+        borderRadius: 8,
+        cursor: 'pointer',
+        backgroundColor: isFlipped ? 'white' : 'blue',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 24,
+        color: isFlipped ? 'black' : 'white',
+        userSelect: 'none',
+        boxShadow: '0 0 5px rgba(0,0,0,0.3)'
+      }}
       onClick={() => handleClick(index)}
     >
-      <div className={`relative w-full h-full transition-all duration-500 ${isFlipped ? 'bg-white' : 'bg-blue-600'} rounded-lg shadow-md`}>
-        {isFlipped ? (
-          <div className="flex items-center justify-center h-full text-3xl font-bold">
-            {card.value}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-white text-xl">
-            ?
-          </div>
-        )}
-      </div>
+      {isFlipped ? card.value : '?'}
     </div>
   );
 };
 
+const CARD_VALUES = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E'];
+
 export default function MemoryCardGame() {
-  // Create card values: 5 pairs = 10 cards total
-  const cardValues = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E'];
-  
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState([]);
@@ -33,12 +36,10 @@ export default function MemoryCardGame() {
   const [scores, setScores] = useState({ 1: 0, 2: 0 });
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
-  
-  // Shuffle cards function - defined outside useCallback
-  const shuffleCards = () => {
-    // Create shuffled cards
-    const shuffled = [...cardValues]
-      .map(value => ({ value, matched: false }))
+
+  const shuffleCards = useCallback(() => {
+    const shuffled = [...CARD_VALUES]
+      .map(value => ({ value }))
       .sort(() => Math.random() - 0.5);
 
     setCards(shuffled);
@@ -48,65 +49,46 @@ export default function MemoryCardGame() {
     setCurrentPlayer(1);
     setGameOver(false);
     setWinner(null);
-  };
-
-  // Initialize game
-  useEffect(() => {
-    shuffleCards();
-    // Empty dependency array means this runs only once on component mount
   }, []);
 
-  // Handle card click
+  useEffect(() => {
+    shuffleCards();
+  }, [shuffleCards]);
+
   const handleCardClick = (index) => {
-    // Prevent clicks if game is over
-    if (gameOver) return;
-    
-    // Prevent clicking already matched cards or clicking more than 2 unmatched cards
     if (
-      matchedPairs.includes(cards[index].value) || 
+      gameOver ||
       flippedIndices.includes(index) ||
-      flippedIndices.length === 2
+      flippedIndices.length === 2 ||
+      matchedPairs.includes(cards[index].value)
     ) {
       return;
     }
 
-    // Flip card
     const newFlippedIndices = [...flippedIndices, index];
     setFlippedIndices(newFlippedIndices);
 
-    // Check for matches if two cards are flipped
     if (newFlippedIndices.length === 2) {
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].value === cards[secondIndex].value) {
-        // Match found
-        setMatchedPairs([...matchedPairs, cards[firstIndex].value]);
-        
-        // Update score for current player
-        const newScores = { ...scores };
-        newScores[currentPlayer] += 5;
+        const newMatchedPairs = [...matchedPairs, cards[firstIndex].value];
+        setMatchedPairs(newMatchedPairs);
+
+        const newScores = { ...scores, [currentPlayer]: scores[currentPlayer] + 5 };
         setScores(newScores);
-        
-        // Check if game is over (5 matches found)
-        if (matchedPairs.length + 1 === 5) { // 5 pairs in total (10 cards paired)
+
+        if (newMatchedPairs.length === 5) {
           setGameOver(true);
-          
-          // Determine winner
-          if (newScores[1] > newScores[2]) {
-            setWinner(1);
-          } else if (newScores[2] > newScores[1]) {
-            setWinner(2);
-          } else {
-            setWinner(0); // Draw
-          }
+          if (newScores[1] > newScores[2]) setWinner(1);
+          else if (newScores[2] > newScores[1]) setWinner(2);
+          else setWinner(0);
         }
-        
-        // Clear flipped indices
+
         setTimeout(() => {
           setFlippedIndices([]);
         }, 1000);
       } else {
-        // No match, switch player after a delay
         setTimeout(() => {
           setFlippedIndices([]);
           setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
@@ -115,25 +97,23 @@ export default function MemoryCardGame() {
     }
   };
 
-  // Check if a card should be displayed as flipped
   const isCardFlipped = (index) => {
     return flippedIndices.includes(index) || matchedPairs.includes(cards[index].value);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-6">Memory Card Game</h1>
-      
-      <div className="mb-4 flex justify-between w-full max-w-md">
-        <div className={`p-3 rounded-lg ${currentPlayer === 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
-          Player 1: {scores[1]} points
+    <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 400, margin: 'auto' }}>
+      <h1>Memory Card Game</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div style={{ padding: 8, backgroundColor: currentPlayer === 1 ? 'dodgerblue' : 'lightgray', color: currentPlayer === 1 ? 'white' : 'black', borderRadius: 4 }}>
+          Player 1: {scores[1]} pts
         </div>
-        <div className={`p-3 rounded-lg ${currentPlayer === 2 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
-          Player 2: {scores[2]} points
+        <div style={{ padding: 8, backgroundColor: currentPlayer === 2 ? 'dodgerblue' : 'lightgray', color: currentPlayer === 2 ? 'white' : 'black', borderRadius: 4 }}>
+          Player 2: {scores[2]} pts
         </div>
       </div>
-      
-      <div className="grid grid-cols-5 gap-4 mb-6">
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
         {cards.map((card, index) => (
           <Card
             key={index}
@@ -144,26 +124,26 @@ export default function MemoryCardGame() {
           />
         ))}
       </div>
-      
+
       {gameOver && (
-        <div className="mt-4 p-4 bg-yellow-100 rounded-lg text-center">
-          <h2 className="text-2xl font-bold mb-2">Game Over!</h2>
+        <div style={{ marginTop: 20, backgroundColor: '#fff3cd', padding: 15, borderRadius: 6, textAlign: 'center' }}>
+          <h2>Game Over!</h2>
           {winner === 0 ? (
             <p>It's a draw!</p>
           ) : (
             <p>Player {winner} wins with {scores[winner]} points!</p>
           )}
-          <button 
-            className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+          <button
+            style={{ marginTop: 10, padding: '10px 20px', backgroundColor: 'dodgerblue', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
             onClick={shuffleCards}
           >
             Play Again
           </button>
         </div>
       )}
-      
+
       {!gameOver && (
-        <div className="mt-4 text-lg font-medium">
+        <div style={{ marginTop: 20, fontWeight: 'bold' }}>
           Player {currentPlayer}'s turn - Choose two cards to flip
         </div>
       )}
