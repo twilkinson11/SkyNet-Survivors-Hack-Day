@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import { useState, useEffect } from 'react'
-import './App.css';
+
 
 // Card component to represent each playing card
 const Card = ({ card, index, handleClick, isFlipped }) => {
@@ -36,10 +35,6 @@ export default function MemoryCardGame() {
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   
-  // Initialize game
-  useEffect(() => {
-    shuffleCards();
-  }, []);
 
   // Shuffle cards
   const shuffleCards = () => {
@@ -47,6 +42,8 @@ export default function MemoryCardGame() {
     const shuffled = [...cardValues]
       .map(value => ({ value, matched: false }))
       .sort(() => Math.random() - 0.5);
+
+      
     
     setCards(shuffled);
     setFlippedIndices([]);
@@ -56,6 +53,11 @@ export default function MemoryCardGame() {
     setGameOver(false);
     setWinner(null);
   };
+
+  // Initialize game
+  useEffect(() => {
+    shuffleCards();
+  } );
 
   // Handle card click
   const handleCardClick = (index) => {
@@ -121,7 +123,7 @@ export default function MemoryCardGame() {
     return flippedIndices.includes(index) || matchedPairs.includes(cards[index].value);
   };
 
-function App() {
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -171,9 +173,10 @@ function App() {
         </div>
       )}
     </div>
-  );
+  )
 }
-}
+
+
 
 
 
